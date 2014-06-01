@@ -9,17 +9,22 @@ import json
 class Sp1Pipeline(object):
 	def __init__(self):
 		#self.file = codecs.open("/tmp/out.json", "wb", encoding="utf-8")
-		filename = response.url.split("/")[-2]
-		self.file = codecs.open(filename, "wb", encoding="utf-8")
+		#filename = response.url.split("/")[-2]
+		#self.file = codecs.open(filename, "wb", encoding="utf-8")
+		pass
 	
 	def process_item(self, item, spider):
+		filename = item['filenm']
+		self.file = codecs.open(filename, "a", encoding="utf-8")
 		line = json.dumps(dict(item), ensure_ascii=False) + "\n"
 		self.file.write(line)
+		self.file.close()
 		return item
 	
 	#def spider_closed(self, spider):
 	def close_spider(self, spider):
-		self.file.close()
+		#self.file.close()
+		pass
 
 
 '''

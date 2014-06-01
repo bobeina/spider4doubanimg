@@ -11,5 +11,5 @@ class Sp1Item(Item):
     title = Field()
     link = Field()
     desc = Field()
-
+    filenm = Field()
 

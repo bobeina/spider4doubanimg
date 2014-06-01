@@ -24,6 +24,7 @@ class Sp1Spider(BaseSpider):
 			item['title']= site.select('a/text()').extract()
 			item['link']= site.select('a/@href').extract()
 			item['desc']= site.select('text()').extract()
+			item['filenm']=response.url.split("/")[-2]+"_"+response.url.split("/")[-1]
 			items.append(item)
 		return items
 

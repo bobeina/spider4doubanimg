@@ -7,7 +7,7 @@ from sp1.items import Sp1Item
 class Sp1Spider(BaseSpider):
 	name = "fx168.com"
 	start_urls = [
-			"http://news.fx168.com/forex/cad/1405/1013688.shtml"
+			"http://www.fx168.com/forex/cad/1405/1013688.shtml"
 			#"http://news.fx168.com/forex/",
 			#"http://news.fx168.com/bank/"
 			]

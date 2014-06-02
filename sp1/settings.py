@@ -14,6 +14,6 @@ NEWSPIDER_MODULE = 'sp1.spiders'
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'sp1 (+http://www.yourdomain.com)'
 
-ITEM_PIPELINES = [
-		'sp1.pipelines.Sp1Pipeline'
-		]
+ITEM_PIPELINES = {
+		'sp1.pipelines.Sp1Pipeline': 300,
+		}

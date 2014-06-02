@@ -45,10 +45,13 @@ class Sp1Spider(BaseSpider):
 				relative_url = urljoin_rfc(base_url,url)
 				validurls.append(relative_url)
 
-		items.extend([self.make_requests_from_url(url).replace(callback=self.parse) for url in validurls])
+		#items.extend([self.make_requests_from_url(url).replace(callback=self.parse) for url in validurls])
+		for url in validurls:
+			yield Request(url,meta = {'item':url},callback=)
 
 		sites = hxs.select('//p')
 		items = []
+		rootdir = '/tmp/spiderData/'
 		for site in sites:
 			desc = site.select('text()').extract()
 			if desc:
@@ -56,7 +59,7 @@ class Sp1Spider(BaseSpider):
 				item['title'] = site.select('a/text()').extract()
 				item['link'] = site.select('a/@href').extract()
 				item['desc'] = desc #site.select('text()').extract()
-				item['filenm']=response.url.split("/")[-2]+"_"+response.url.split("/")[-1]
+				item['filenm'] = rootdir + response.url.split("/")[-2]+"_"+response.url.split("/")[-1]
 				items.append(item)
 		return items
 

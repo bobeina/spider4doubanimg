@@ -14,54 +14,48 @@ class Sp1Spider(BaseSpider):
 			#"http://news.fx168.com/forex/",
 			"http://news.fx168.com/bank/"
 			]
+	rootdir = '/tmp/spiderData/'
+
+	def parse2(self, response):
+		hxs = HtmlXPathSelector(response)
+		item = response.meta['item']
+		items = []
+		contents = hxs.select('//p')
+
+		for content in contents:
+			desc = content.xpath('text()').extract()
+			if desc:
+				crnt_item = {} #contentItem()
+				crnt_item['content'] = desc
+				crnt_item['filenm'] = self.rootdir + response.url.split("/")[-2]+"_"+response.url.split("/")[-1]
+				items.append(crnt_item)
+
+		return items
+
 
 	def parse(self, response):
-		'''
-		#filenm = response.url.split("/")[-2]
-		#open(filenm, 'wb').write(response.body)
-		hxs = HtmlXPathSelector(response)
-		#sites = hxs.select('//ul/li')
-		sites = hxs.select('//p')
-		items = []
-		for site in sites:
-			item = Sp1Item()
-			item['title']= site.select('a/text()').extract()
-			item['link']= site.select('a/@href').extract()
-			item['desc']= site.select('text()').extract()
-			item['filenm']=response.url.split("/")[-2]+"_"+response.url.split("/")[-1]
-			items.append(item)
-		return items
-		'''
 		hxs = HtmlXPathSelector(response)
 		items = []
 
-		#newurls = hxs.select('//a/@href').extract()
+		title = hxs.xpath('//a/text()').extract()
+		url = hxs.xpath('//a/@href').extract()
+
 		base_url = get_base_url(response)
 		newurls = hxs.xpath('//a/@href').extract()
 		validurls = []
+		i=0
 		for url in newurls:
 			if True:#url[0]!='#' and url:
-				#validurls.append(url)
+				#validurls.append(ural)
+				item = Sp1Item()
 				relative_url = urljoin_rfc(base_url,url)
+				item['link'] = ralative_url
+				item['title'] = title[i][:]
 				validurls.append(relative_url)
+			i = i+1
 
 		#items.extend([self.make_requests_from_url(url).replace(callback=self.parse) for url in validurls])
 		for url in validurls:
-			yield Request(url,meta = {'item':url},callback=)
-
-		sites = hxs.select('//p')
-		items = []
-		rootdir = '/tmp/spiderData/'
-		for site in sites:
-			desc = site.select('text()').extract()
-			if desc:
-				item = Sp1Item()
-				item['title'] = site.select('a/text()').extract()
-				item['link'] = site.select('a/@href').extract()
-				item['desc'] = desc #site.select('text()').extract()
-				item['filenm'] = rootdir + response.url.split("/")[-2]+"_"+response.url.split("/")[-1]
-				items.append(item)
-		return items
-
+			yield Request(url['link'],meta = {'item':url,callback=self.parse2)
 
 

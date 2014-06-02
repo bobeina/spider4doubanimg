@@ -8,8 +8,8 @@ from scrapy.item import Item, Field
 class Sp1Item(Item):
     # define the fields for your item here like:
     # name = Field()
-    title = Field()
     link = Field()
-    desc = Field()
+    title = Field()
+    content = Field()
     filenm = Field()
 

@@ -8,11 +8,12 @@ from scrapy.utils.url import urljoin_rfc
 from scrapy.http import Request
 
 class Sp1Spider(Spider):#(BaseSpider):
-	name = "fx168.com"
+	name = "douban.com" #"fx168.com"
 	start_urls = [
 			#"http://www.fx168.com/forex/cad/1405/1013688.shtml"
 			#"http://news.fx168.com/forex/",
-			"http://news.fx168.com/bank/"
+			#"http://news.fx168.com/bank/"
+			"http://www.douban.com"
 			]
 	rootdir = '/tmp/spiderData/'
 
@@ -24,7 +25,7 @@ class Sp1Spider(Spider):#(BaseSpider):
 
 		for content in contents:
 			desc = content.xpath('text()').extract()
-			if desc:
+			if True:#desc:
 				crnt_item = Sp1Item() #contentItem()
 				crnt_item['content'] = desc
 				crnt_item['filenm'] = self.rootdir + response.url.split("/")[-2]+"_"+response.url.split("/")[-1]
@@ -41,17 +42,19 @@ class Sp1Spider(Spider):#(BaseSpider):
 		base_url = get_base_url(response)
 
 		validurls = []
-		i=0
+		#i=0
 
 		for site in sites:
 			url = site.select('@href').extract()
-			if url:
-				if url[0]=='#':
+			#print '        <<<',url,'>>>'
+			if url[0]:
+				if url[0][0]=='#':
 					continue
-				if url[0]=='/':
-					relative_url = urljoin_rfc(base_url,url)
+				if url[0][0]=='/':
+					relative_url = urljoin_rfc(base_url,url[0])
+					#print '----------------------',relative_url[0]
 				else:
-					relative_url = url
+					relative_url = url[0]
 			else:
 				continue
 			
@@ -59,9 +62,14 @@ class Sp1Spider(Spider):#(BaseSpider):
 			item['link'] = relative_url
 			item['title'] =site.select('text()').extract()
 			validurls.append(item)
-			i = i+1
+			#i = i+1
 
-		for url in validurls:
-			yield Request(url['link'][0],meta = {'item':url},callback=self.parse2)
+		for crntlink in validurls:
+			#print " ############################ link=",crntlink['link'],'#############################'
+
+			try:
+				yield Request(crntlink['link'],meta = {'item':crntlink},callback=self.parse2)
+			except:
+				pass
 
 

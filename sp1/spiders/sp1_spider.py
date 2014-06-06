@@ -13,7 +13,7 @@ class Sp1Spider(Spider):#(BaseSpider):
 			#"http://www.fx168.com/forex/cad/1405/1013688.shtml"
 			#"http://news.fx168.com/forex/",
 			#"http://news.fx168.com/bank/"
-			"http://www.douban.com"
+			"http://www.douban.com/group/explore"
 			]
 	rootdir = '/tmp/spiderData/'
 
@@ -42,34 +42,36 @@ class Sp1Spider(Spider):#(BaseSpider):
 		base_url = get_base_url(response)
 
 		validurls = []
-		#i=0
 
+		topic_url = 'topic'
+		i = 0
 		for site in sites:
-			url = site.select('@href').extract()
+			url = site.xpath('@href').extract()
 			#print '        <<<',url,'>>>'
 			if url[0]:
 				if url[0][0]=='#':
 					continue
-				if url[0][0]=='/':
+				if url[0][0]=='/' or url[0][0]=='?' :
 					relative_url = urljoin_rfc(base_url,url[0])
 					#print '----------------------',relative_url[0]
 				else:
 					relative_url = url[0]
 			else:
 				continue
+
+			if topic_url not in relative_url:
+				#print u'~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%s'%(relative_url)
+				continue
 			
 			item = Sp1Item()
 			item['link'] = relative_url
-			item['title'] =site.select('text()').extract()
+			item['title'] =site.xpath('text()').extract()
 			validurls.append(item)
-			#i = i+1
+			i = i+1
 
 		for crntlink in validurls:
-			#print " ############################ link=",crntlink['link'],'#############################'
-
-			try:
-				yield Request(crntlink['link'],meta = {'item':crntlink},callback=self.parse2)
-			except:
-				pass
+			yield Request(crntlink['link'],meta = {'item':crntlink},callback=self.parse2)
+			yield Request(crntlink['link'],meta = {'item':crntlink},callback=self.parse)
+			#yield Request(crntlink['link'],meta = {'item':crntlink},callback=self.parse)
 
 

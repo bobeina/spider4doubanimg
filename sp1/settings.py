@@ -17,3 +17,7 @@ NEWSPIDER_MODULE = 'sp1.spiders'
 ITEM_PIPELINES = {
 		'sp1.pipelines.Sp1Pipeline': 300,
 		}
+
+DOWNLOADER_MIDDLEWARES = {
+		'scrapy.contrib.downloadermiddleware.redirect.RedirectMiddleware':123,
+		}

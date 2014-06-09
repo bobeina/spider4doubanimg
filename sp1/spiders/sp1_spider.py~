@@ -17,6 +17,7 @@ class Sp1Spider(Spider):#(BaseSpider):
 			]
 	rootdir = '/tmp/spiderData/'
 
+
 	def parse2(self, response):
 		hxs = HtmlXPathSelector(response)
 		item = response.meta['item']
@@ -46,6 +47,9 @@ class Sp1Spider(Spider):#(BaseSpider):
 		topic_url = 'topic'
 		i = 0
 		for site in sites:
+			if i>2:
+				break
+
 			url = site.xpath('@href').extract()
 			#print '        <<<',url,'>>>'
 			if url[0]:
@@ -70,14 +74,7 @@ class Sp1Spider(Spider):#(BaseSpider):
 			i = i+1
 
 		for crntlink in validurls:
-			#print " ############################ link=",crntlink['link'],'#############################'
-
-			try:
-				yield Request(crntlink['link'],meta = {'item':crntlink},callback=self.parse2)
-				#yield Request(crntlink['link'],meta = {'item':crntlink},callback=self.parse)
-			except:
-				pass
-			finally:
-				yield Request(crntlink['link'],meta = {'item':crntlink},callback=self.parse)
+			yield Request(crntlink['link'],meta = {'item':crntlink},callback=self.parse)
+			yield Request(crntlink['link'],meta = {'item':crntlink},callback=self.parse2)
 
 

@@ -17,6 +17,46 @@ class Sp1Spider(Spider):#(BaseSpider):
 			]
 	rootdir = '/tmp/spiderData/'
 
+        allowed_domains = ['douban.com']
+
+	'''
+        rules = (
+            #Rule(SgmlLinkExtractor(allow=(r'http://www.qunar.com/routes/.*')), callback='parse'),
+            #Rule(SgmlLinkExtractor(allow=('http:.*/routes/.*')), callback='parse'),
+        )
+	'''
+
+        def parse(self, response):
+	    item = SitemapItem()
+            x         = HtmlXPathSelector(response)
+            raw_urls  = x.select("//a/@href").extract()
+            urls      = []
+            for url in raw_urls:
+		#if 'routes' in url:
+		if 'http' not in url:
+		    url = 'http://www.douban.com' + url
+                    urls.append(url)
+
+            for url in urls:
+		yield Request(url)
+
+            #item['url']         = response.url.encode('UTF-8')
+            #arr_keywords        = x.select("//meta[@name='keywords']/@content").extract()
+            #item['keywords']    = arr_keywords[0].encode('UTF-8')
+            #arr_description     = x.select("//meta[@name='description']/@content").extract()
+            #item['description'] = arr_description[0].encode('UTF-8')
+
+	    contents = hxs.select('//p')
+	    item = []
+	    for content in  contents:
+		    desc = content.xpath('text()').extract()
+		    crnt_item = Sp1Item()
+		    crnt_item['content'] = desc
+		    crnt_item['filenm'] = self.rootdir + response.url.split("/")[-2]+"_"+response.url.split("/")[-1]
+		    item.append(crnt_item)
+		    yield item
+
+        '''
 	def parse2(self, response):
 		hxs = HtmlXPathSelector(response)
 		item = response.meta['item']
@@ -46,6 +86,9 @@ class Sp1Spider(Spider):#(BaseSpider):
 		topic_url = 'topic'
 		i = 0
 		for site in sites:
+			if i>2:
+				break
+
 			url = site.xpath('@href').extract()
 			#print '        <<<',url,'>>>'
 			if url[0]:
@@ -70,8 +113,8 @@ class Sp1Spider(Spider):#(BaseSpider):
 			i = i+1
 
 		for crntlink in validurls:
-			yield Request(crntlink['link'],meta = {'item':crntlink},callback=self.parse2)
 			yield Request(crntlink['link'],meta = {'item':crntlink},callback=self.parse)
-			#yield Request(crntlink['link'],meta = {'item':crntlink},callback=self.parse)
+			yield Request(crntlink['link'],meta = {'item':crntlink},callback=self.parse2)
+	'''
 
 

@@ -13,7 +13,8 @@ class Sp1Spider(Spider):#(BaseSpider):
 			#"http://www.fx168.com/forex/cad/1405/1013688.shtml"
 			#"http://news.fx168.com/forex/",
 			#"http://news.fx168.com/bank/"
-			"http://www.douban.com/group/explore"
+			#"http://www.douban.com/group/explore"
+			"http://www.douban.com"
 			]
 	rootdir = '/tmp/spiderData/'
 
@@ -27,34 +28,32 @@ class Sp1Spider(Spider):#(BaseSpider):
 	'''
 
         def parse(self, response):
-	    item = SitemapItem()
-            x         = HtmlXPathSelector(response)
-            raw_urls  = x.select("//a/@href").extract()
+	    #item = Sp1Item()
+            hxs         = HtmlXPathSelector(response)
+            raw_urls  = hxs.select("//a/@href").extract()
             urls      = []
             for url in raw_urls:
 		#if 'routes' in url:
-		if 'http' not in url:
-		    url = 'http://www.douban.com' + url
-                    urls.append(url)
+		#if 'douban' not in url:
+		if 'http' not in url and 'douban' not in url:
+		    url = 'http://www.douban.com/group/explore' + url
+                urls.append(url)
 
             for url in urls:
-		yield Request(url)
-
-            #item['url']         = response.url.encode('UTF-8')
-            #arr_keywords        = x.select("//meta[@name='keywords']/@content").extract()
-            #item['keywords']    = arr_keywords[0].encode('UTF-8')
-            #arr_description     = x.select("//meta[@name='description']/@content").extract()
-            #item['description'] = arr_description[0].encode('UTF-8')
+		#yield Request(url)
+		yield Request(url,meta = {'item':url},callback=self.parse)
 
 	    contents = hxs.select('//p')
-	    item = []
+	    crntText = ''
 	    for content in  contents:
-		    desc = content.xpath('text()').extract()
-		    crnt_item = Sp1Item()
-		    crnt_item['content'] = desc
-		    crnt_item['filenm'] = self.rootdir + response.url.split("/")[-2]+"_"+response.url.split("/")[-1]
-		    item.append(crnt_item)
-		    yield item
+	        desc = content.xpath('text()').extract()
+		#crntText = crntText + desc +'\r\n'
+	        crnt_item = Sp1Item()
+	        crnt_item['content'] = desc
+	        crnt_item['filenm'] = self.rootdir + response.url.split("/")[-2]+"_"+response.url.split("/")[-1]
+	        crnt_item['link'] = response.url
+	        #item.append(crnt_item)
+	        yield crnt_item
 
         '''
 	def parse2(self, response):

@@ -17,7 +17,44 @@ class Sp1Spider(Spider):#(BaseSpider):
 			]
 	rootdir = '/tmp/spiderData/'
 
+        allowed_domains = ['douban.com']
 
+	'''
+        rules = (
+            #Rule(SgmlLinkExtractor(allow=(r'http://www.qunar.com/routes/.*')), callback='parse'),
+            #Rule(SgmlLinkExtractor(allow=('http:.*/routes/.*')), callback='parse'),
+        )
+	'''
+
+        def parse(self, response):
+	    #item = Sp1Item()
+            hxs         = HtmlXPathSelector(response)
+            raw_urls  = hxs.select("//a/@href").extract()
+            urls      = []
+            for url in raw_urls:
+		#if 'routes' in url:
+		#if 'douban' not in url:
+		if 'http' not in url and 'douban' not in url:
+		    url = 'http://www.douban.com/group/explore' + url
+                urls.append(url)
+
+            for url in urls:
+		#yield Request(url)
+		yield Request(url,meta = {'item':url},callback=self.parse)
+
+	    contents = hxs.select('//p')
+	    crntText = ''
+	    for content in  contents:
+	        desc = content.xpath('text()').extract()
+		#crntText = crntText + desc +'\r\n'
+	        crnt_item = Sp1Item()
+	        crnt_item['content'] = desc
+	        crnt_item['filenm'] = self.rootdir + response.url.split("/")[-2]+"_"+response.url.split("/")[-1]
+	        crnt_item['link'] = response.url
+	        #item.append(crnt_item)
+	        yield crnt_item
+
+        '''
 	def parse2(self, response):
 		hxs = HtmlXPathSelector(response)
 		item = response.meta['item']
@@ -76,5 +113,6 @@ class Sp1Spider(Spider):#(BaseSpider):
 		for crntlink in validurls:
 			yield Request(crntlink['link'],meta = {'item':crntlink},callback=self.parse)
 			yield Request(crntlink['link'],meta = {'item':crntlink},callback=self.parse2)
+	'''
 
 

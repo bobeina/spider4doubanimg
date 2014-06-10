@@ -14,7 +14,7 @@ class Sp1Spider(Spider):#(BaseSpider):
 			#"http://news.fx168.com/forex/",
 			#"http://news.fx168.com/bank/"
 			#"http://www.douban.com/group/explore"
-			"http://www.douban.com"
+			"http://www.douban.com/"
 			]
 	rootdir = '/tmp/spiderData/'
 
@@ -33,10 +33,17 @@ class Sp1Spider(Spider):#(BaseSpider):
             raw_urls  = hxs.select("//a/@href").extract()
             urls      = []
             for url in raw_urls:
-		#if 'routes' in url:
-		#if 'douban' not in url:
+		#print '=================> url = ',url
+		if not url:
+		    continue
+	        if url[0]=='#':
+		    continue
+
 		if 'http' not in url and 'douban' not in url:
-		    url = 'http://www.douban.com/group/explore' + url
+		    if url[0]=='?':
+			url = 'http://www.douban.com/group/explore' + url
+		    else:
+			url = 'http://www.douban.com' + url
                 urls.append(url)
 
             for url in urls:

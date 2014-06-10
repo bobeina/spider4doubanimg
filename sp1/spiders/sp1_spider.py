@@ -14,7 +14,8 @@ class Sp1Spider(Spider):#(BaseSpider):
 			#"http://news.fx168.com/forex/",
 			#"http://news.fx168.com/bank/"
 			#"http://www.douban.com/group/explore"
-			"http://www.douban.com/"
+			#"http://www.douban.com/"
+			"http://www.douban.com/group/haixiuzu"
 			]
 	rootdir = '/tmp/spiderData/'
 

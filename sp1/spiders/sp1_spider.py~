@@ -55,34 +55,23 @@ class Sp1Spider(Spider):#(BaseSpider):
 		topic = hxs.xpath('//div/h1/text()').extract()
 		
 		if match_crnt_topic:
-			contents = hxs.xpath('//p/text()').extract()
-			desc = ''
-			for content in  contents:
-				desc = desc.join(content[0])
-				desc = desc.join("\n")
-			#imgurls = hxs.xpath("//div[@class='topic-content clearfix']/div[@class='topic-doc']/div/div[@class='/div[@class=topic-content]/div[@class='topic-figure cc']/img/@src()")#.extract()
-			#imgurls = hxs.xpath("//div[@class='topic-tontent']//div//img/@src()").extract()
 			imgurls = hxs.xpath("//div[@class='topic-figure cc']/img/@src").extract()
-			#imgurls = hxs.xpath("//img/@src").extract()
-			imgurls_txt = ''
-
-			print '>>>>>>>>>>>>>>> img urls = ',imgurls
-
-			'''
-
-			for imgurl in imgurls:
-				imgurls_txt = imgurls_txt + imgurl[0]
-				imgurls_txt = imgurls_txt + ';'
-			'''
-			imgurls_txt = ';'.join(imgurls)
-			crnt_item = Sp1Item()
-			crnt_item['title'] = topic[0]
-			crnt_item['filenm'] = self.rootdir + response.url.split("/")[-2]+"_"+response.url.split("/")[-1]
-			crnt_item['link'] = response.url
-			crnt_item['content'] = desc
-			crnt_item['imgurls'] = imgurls_txt
-			#item.append(crnt_item)
-			yield crnt_item
+			if imgurls:
+				contents = hxs.xpath('//p/text()').extract()
+				desc = '\n'.join(contents)
+				imgurls = hxs.xpath("//div[@class='topic-figure cc']/img/@src").extract()
+				imgurls_txt = ''
+				
+				#print '>>>>>>>>>>>>>>> img urls = ',imgurls
+				imgurls_txt = ';'.join(imgurls)
+				crnt_item = Sp1Item()
+				crnt_item['title'] = topic[0]
+				crnt_item['filenm'] = self.rootdir + response.url.split("/")[-2]+"_"+response.url.split("/")[-1]
+				crnt_item['link'] = response.url
+				crnt_item['content'] = desc
+				crnt_item['imgurls'] = imgurls_txt
+				#item.append(crnt_item)
+				yield crnt_item
 
         '''
 	def parse2(self, response):

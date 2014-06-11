@@ -17,7 +17,7 @@ class Sp1Pipeline(object):
 		filename = item['filenm']
 		self.file = codecs.open(filename, "a", encoding="utf-8")
 		#line = json.dumps(dict(item))#, ensure_ascii=False)# + "\n"
-		line = u"[title]\n%s\n[filename]\n%s\n[link]\n%s[content]\n%s" % ( item['title'], item['filenm'], item['link'], item['content'])
+		line = u"[title]\n%s\n[filename]\n%s\n[link]\n%s\n[img urls]\n%s\n[content]\n%s" % ( item['title'], item['filenm'], item['link'], item['imgurls'], item['content'])
 		self.file.write(line)
 		self.file.close()
 		return item

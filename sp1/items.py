@@ -12,5 +12,5 @@ class Sp1Item(Item):
     title = Field()
     content = Field()
     filenm = Field()
-    imgurl = Field()
+    imgurls = Field()
 

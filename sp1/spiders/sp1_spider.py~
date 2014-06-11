@@ -7,6 +7,8 @@ from scrapy.utils.response import get_base_url
 from scrapy.utils.url import urljoin_rfc
 from scrapy.http import Request
 
+import re
+
 class Sp1Spider(Spider):#(BaseSpider):
 	name = "douban.com" #"fx168.com"
 	start_urls = [
@@ -14,7 +16,9 @@ class Sp1Spider(Spider):#(BaseSpider):
 			#"http://news.fx168.com/forex/",
 			#"http://news.fx168.com/bank/"
 			#"http://www.douban.com/group/explore"
-			"http://www.douban.com/"
+			#"http://www.douban.com/"
+			#"http://www.douban.com/group/haixiuzu",
+			"http://www.douban.com/group/meituikong"
 			]
 	rootdir = '/tmp/spiderData/'
 
@@ -28,39 +32,41 @@ class Sp1Spider(Spider):#(BaseSpider):
 	'''
 
         def parse(self, response):
-	    #item = Sp1Item()
-            hxs         = HtmlXPathSelector(response)
-            raw_urls  = hxs.select("//a/@href").extract()
-            urls      = []
-            for url in raw_urls:
-		#print '=================> url = ',url
-		if not url:
-		    continue
-	        if url[0]=='#':
-		    continue
-
-		if 'http' not in url and 'douban' not in url:
-		    if url[0]=='?':
-			url = 'http://www.douban.com/group/explore' + url
-		    else:
-			url = 'http://www.douban.com' + url
-                urls.append(url)
-
-            for url in urls:
-		#yield Request(url)
-		yield Request(url,meta = {'item':url},callback=self.parse)
-
-	    contents = hxs.select('//p')
-	    crntText = ''
-	    for content in  contents:
-	        desc = content.xpath('text()').extract()
-		#crntText = crntText + desc +'\r\n'
-	        crnt_item = Sp1Item()
-	        crnt_item['content'] = desc
-	        crnt_item['filenm'] = self.rootdir + response.url.split("/")[-2]+"_"+response.url.split("/")[-1]
-	        crnt_item['link'] = response.url
-	        #item.append(crnt_item)
-	        yield crnt_item
+		#item = Sp1Item()
+		hxs         = HtmlXPathSelector(response)
+		raw_urls  = hxs.select("//a/@href").extract()
+		urls      = []
+		
+		pattern_topic = re.compile(r'http://www.douban.com/group/topic/(\d+)/')
+		pattern_topic_list = re.compile(r'http://www.douban.com/group/(\w+)/discussion\?start=(\d+)')
+		for url in raw_urls:
+			#print '=================> url = ',url
+			match_list = pattern_topic_list.match(url)
+			match_topic = pattern_topic.match(url)
+			if match_list or match_topic:
+				urls.append(url)
+		
+		for url in urls:
+			#yield Request(url)
+			yield Request(url,meta = {'item':url},callback=self.parse)
+			
+		# get img
+		match_crnt_topic = pattern_topic.match(response.url)
+		topic = hxs.xpath('//div/h1/text()').extract()
+		
+		if match_crnt_topic:
+			contents = hxs.xpath('//p/text()').extract()
+			desc = ''
+			for content in  contents:
+				desc = desc.join(content)
+				desc = desc.join("\n")
+			crnt_item = Sp1Item()
+			crnt_item['title'] = topic
+			crnt_item['filenm'] = self.rootdir + response.url.split("/")[-2]+"_"+response.url.split("/")[-1]
+			crnt_item['link'] = response.url
+			crnt_item['content'] = desc
+			#item.append(crnt_item)
+			yield crnt_item
 
         '''
 	def parse2(self, response):
